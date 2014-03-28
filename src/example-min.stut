@@ -1,0 +1,15 @@
+basically umm, this should print:
+Seq [
+    Assign "a" (IntConst 3),
+    Assign "b" (IntConst 4),
+    Assign "c" (ABinary Add (Var "a") (Var "b")),
+    If (RBinary Equal (Var "c") (IntConst 7))
+       (Seq [Print (IntConst 1)])
+       (Seq [Print (IntConst 0)]),
+    Assign "i" (IntConst 10),
+    While (RBinary Greater (Var "i") (IntConst 0))
+          (Seq [
+              Print (Var "i"),
+              Assign "i" (ABinary Subtract (Var "i") (IntConst 1))
+          ])
+] yeah... a is like 3? b is like 4? c is like a plus b? if c equals 7 then basically print 1 so yeah otherwise basically print 0 so yeah? i is like 10? while i is bigger than 0 basically print i? i is like i minus 1 so yeah so yeah
