@@ -1,4 +1,4 @@
-module ParseStuttering where
+module Stuttering.Parser where
 
 import Control.Monad
 import Text.ParserCombinators.Parsec

@@ -1,6 +1,6 @@
 module Main where
 
-import ParseStuttering
+import Stuttering.Parser
 
 main = do
   ast <- parseFile "example.stut"
