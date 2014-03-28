@@ -164,16 +164,16 @@ bExpression = buildExpressionParser bOperators bTerm
 
 aOperators =
   [ [Prefix (reservedOp "negative" >> return Neg)]
-  , [Infix (reservedOp "times" >> return (ABinary Multiply)) AssocLeft]
-  , [Infix (reservedOp "over" >> return (ABinary Divide)) AssocLeft]
-  , [Infix (reservedOp "plus" >> return (ABinary Add)) AssocLeft]
-  , [Infix (reservedOp "minus" >> return (ABinary Subtract)) AssocLeft]
+  , [Infix  (reservedOp "times"    >> return (ABinary Multiply)) AssocLeft]
+  , [Infix  (reservedOp "over"     >> return (ABinary Divide)) AssocLeft]
+  , [Infix  (reservedOp "plus"     >> return (ABinary Add)) AssocLeft]
+  , [Infix  (reservedOp "minus"    >> return (ABinary Subtract)) AssocLeft]
   ]
 
 bOperators =
   [ [Prefix (reservedOp "not" >> return Not)]
-  , [Infix (reservedOp "and" >> return (BBinary And)) AssocLeft]
-  , [Infix (reservedOp "or" >> return (BBinary Or)) AssocLeft]
+  , [Infix  (reservedOp "and" >> return (BBinary And)) AssocLeft]
+  , [Infix  (reservedOp "or"  >> return (BBinary Or)) AssocLeft]
   ]
 
 aTerm = parens aExpression
