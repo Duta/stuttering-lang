@@ -1,7 +1,6 @@
 module Main where
 
 import Stuttering.Parser
+import Stuttering.JavaOutput
 
-main = do
-  ast <- parseFile "example.stut"
-  print ast
+main = parseFile "example.stut" >>= putStrLn . output

@@ -1,4 +1,13 @@
-module Stuttering.Parser where
+module Stuttering.Parser
+( parseString
+, parseFile
+, BExpr(..)
+, BBinOp(..)
+, RBinOp(..)
+, AExpr(..)
+, ABinOp(..)
+, Stmt(..)
+) where
 
 import Control.Monad
 import Text.ParserCombinators.Parsec
