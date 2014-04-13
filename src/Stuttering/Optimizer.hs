@@ -12,7 +12,10 @@ optStmt :: Stmt -> Stmt
 optStmt (Seq stmts)       = Seq (map optStmt stmts)
 optStmt (Assign id expr)  = Assign id (optAExpr expr)
 optStmt (Print expr)      = Print (optAExpr expr)
-optStmt (If cond s1 s2)   = If (optBExpr cond) (optStmt s1) (optStmt s2)
+optStmt (If cond s1 s2)   = case (optBExpr cond, optStmt s1, optStmt s2) of
+  (BoolConst True,  os1, _) -> os1
+  (BoolConst False, _, os2) -> os2
+  (optCond, os1, os2) -> If optCond os1 os2
 optStmt (While cond stmt) = While (optBExpr cond) (optStmt stmt)
 
 optAExpr :: AExpr -> AExpr
