@@ -16,24 +16,39 @@ optStmt (If cond s1 s2)   = If (optBExpr cond) (optStmt s1) (optStmt s2)
 optStmt (While cond stmt) = While (optBExpr cond) (optStmt stmt)
 
 optAExpr :: AExpr -> AExpr
-optAExpr (Var str)          = Var str
-optAExpr (IntConst int)     = IntConst int
-optAExpr (Neg expr)         = Neg (optAExpr expr)
-optAExpr expr@(ABinary _ _ _) = maybe expr IntConst $ constAExpr expr
+optAExpr (Var str) = Var str
+optAExpr (IntConst int) = IntConst int
+optAExpr (Neg expr) = case optAExpr expr of
+  IntConst int -> IntConst $ -int
+  optExpr -> Neg optExpr
+optAExpr (ABinary op e1 e2) = case (optAExpr e1, optAExpr e2) of
+  (IntConst i1, IntConst i2) -> IntConst $ case op of
+    Add      -> i1 + i2
+    Subtract -> i1 - i2
+    Multiply -> i1 * i2
+    Divide   -> i1 `div` i2
+  (oe1, oe2) -> ABinary op oe1 oe2
 
 optBExpr :: BExpr -> BExpr
 optBExpr (BoolConst bool)   = BoolConst bool
 optBExpr (Not expr)         = Not (optBExpr expr)
-optBExpr (BBinary op e1 e2) = BBinary op (optBExpr e1) (optBExpr e2)
-optBExpr (RBinary op e1 e2) = RBinary op (optAExpr e1) (optAExpr e2)
-
-constAExpr :: AExpr -> Maybe Integer
-constAExpr (Var _)                  = Nothing
-constAExpr (IntConst int)           = Just int
-constAExpr (Neg expr)               = (*(-1)) <$> constAExpr expr
-constAExpr (ABinary Add      e1 e2) = (+) <$> constAExpr e1 <*> constAExpr e2
-constAExpr (ABinary Subtract e1 e2) = (-) <$> constAExpr e1 <*> constAExpr e2
-constAExpr (ABinary Multiply e1 e2) = (*) <$> constAExpr e1 <*> constAExpr e2
-constAExpr (ABinary Divide   e1 e2) = (div) <$> constAExpr e1 <*> constAExpr e2
-
-
+optBExpr (BBinary And e1 e2) = case (optBExpr e1, optBExpr e2) of
+  (BoolConst True, x) -> x
+  (x, BoolConst True) -> x
+  (BoolConst False, _) -> BoolConst False
+  (_, BoolConst False) -> BoolConst False
+  (oe1, oe2) -> BBinary And oe1 oe2
+optBExpr (BBinary Or e1 e2) = case (optBExpr e1, optBExpr e2) of
+  (BoolConst False, x) -> x
+  (x, BoolConst False) -> x
+  (BoolConst True, _) -> BoolConst True
+  (_, BoolConst True) -> BoolConst True
+  (oe1, oe2) -> BBinary And oe1 oe2
+optBExpr (RBinary op e1 e2) = case (optAExpr e1, optAExpr e2) of
+  (IntConst i1, IntConst i2) -> BoolConst $ case op of
+    Greater        -> i1 >  i2
+    Less           -> i1 <  i2
+    Equal          -> i1 == i2
+    GreaterOrEqual -> i1 >= i2
+    LessOrEqual    -> i1 <= i2
+  (oe1, oe2) -> RBinary op oe1 oe2

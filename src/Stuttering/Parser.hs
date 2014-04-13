@@ -19,37 +19,37 @@ data BExpr = BoolConst Bool
            | Not BExpr
            | BBinary BBinOp BExpr BExpr
            | RBinary RBinOp AExpr AExpr
-             deriving (Show)
+             deriving (Show, Eq)
 
 data BBinOp = And
             | Or
-              deriving (Show)
+              deriving (Show, Eq)
 
 data RBinOp = Greater
             | Less
             | Equal
             | GreaterOrEqual
             | LessOrEqual
-              deriving (Show)
+              deriving (Show, Eq)
 
 data AExpr = Var String
            | IntConst Integer
            | Neg AExpr
            | ABinary ABinOp AExpr AExpr
-             deriving (Show)
+             deriving (Show, Eq)
 
 data ABinOp = Add
             | Subtract
             | Multiply
             | Divide
-              deriving (Show)
+              deriving (Show, Eq)
 
 data Stmt = Seq [Stmt]
           | Assign String AExpr
           | Print AExpr
           | If BExpr Stmt Stmt
           | While BExpr Stmt
-            deriving (Show)
+            deriving (Show, Eq)
 
 languageDef = emptyDef
   { Token.commentStart = "umm,"
