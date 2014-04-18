@@ -51,13 +51,14 @@ data Stmt = Seq [Stmt]
           | While BExpr Stmt
             deriving (Show, Eq)
 
+languageDef :: LanguageDef st
 languageDef = emptyDef
-  { Token.commentStart = "umm,"
-  , Token.commentEnd = "yeah..."
-  , Token.commentLine = "um,"
-  , Token.identStart = letter
-  , Token.identLetter = alphaNum
-  , Token.reservedNames =
+  { Token.commentStart    = "umm,"
+  , Token.commentEnd      = "yeah..."
+  , Token.commentLine     = "um,"
+  , Token.identStart      = letter
+  , Token.identLetter     = alphaNum
+  , Token.reservedNames   =
     [ "basically"
     , "is"
     , "like"
@@ -88,6 +89,7 @@ languageDef = emptyDef
     ]
   }
 
+lexer :: Token.TokenParser st
 lexer = Token.makeTokenParser languageDef
 
 -- Parses an identifier

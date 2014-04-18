@@ -3,7 +3,6 @@ module Stuttering.Optimizer
 ) where
 
 import Stuttering.Parser
-import Control.Applicative
 
 optimize :: Stmt -> Stmt
 optimize = optStmt
