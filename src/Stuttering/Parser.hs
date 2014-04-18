@@ -91,22 +91,22 @@ languageDef = emptyDef
 lexer = Token.makeTokenParser languageDef
 
 -- Parses an identifier
-identifier = Token.identifier lexer
+identifier   = Token.identifier lexer
 -- Parses a reserved name
-reserved = Token.reserved lexer
+reserved     = Token.reserved lexer
 -- Parses an operator
-reservedOp = Token.reservedOp lexer
+reservedOp   = Token.reservedOp lexer
 -- Parses surrounding parentheses:
 --   parens p
 -- Takes care of the parentheses and
 -- uses p to parse what's inside them
-parens = Token.parens lexer
+parens       = Token.parens lexer
 -- Parses an integer
-integer = Token.integer lexer
+integer      = Token.integer lexer
 -- Parses a separator (a question mark)
-sep = Token.symbol lexer "?"
+sep          = Token.symbol lexer "?"
 -- Parses whitespace
-whiteSpace = Token.whiteSpace lexer
+whiteSpace   = Token.whiteSpace lexer
 -- Parses a scope block
 block parser = do
   reserved "basically"
@@ -171,6 +171,7 @@ aExpression = buildExpressionParser aOperators aTerm
 bExpression :: Parser BExpr
 bExpression = buildExpressionParser bOperators bTerm
 
+aOperators :: OperatorTable Char st AExpr
 aOperators =
   [ [Prefix (reservedOp "negative" >> return Neg)]
   , [Infix  (reservedOp "times"    >> return (ABinary Multiply)) AssocLeft]
@@ -179,43 +180,51 @@ aOperators =
   , [Infix  (reservedOp "minus"    >> return (ABinary Subtract)) AssocLeft]
   ]
 
+bOperators :: OperatorTable Char st BExpr
 bOperators =
   [ [Prefix (reservedOp "not" >> return Not)]
   , [Infix  (reservedOp "and" >> return (BBinary And)) AssocLeft]
   , [Infix  (reservedOp "or"  >> return (BBinary Or)) AssocLeft]
   ]
 
+aTerm :: Parser AExpr
 aTerm = parens aExpression
     <|> liftM Var identifier
     <|> liftM IntConst integer
 
+bTerm :: Parser BExpr
 bTerm = parens bExpression
     <|> (reserved "right" >> return (BoolConst True))
     <|> (reserved "wrong" >> return (BoolConst False))
     <|> rExpression
 
+rExpression :: Parser BExpr
 rExpression = do
   a1 <- aExpression
   op <- relation
   a2 <- aExpression
   return $ RBinary op a1 a2
 
+relation :: Parser RBinOp
 relation = greaterThanRelation
        <|> lessThanRelation
        <|> equalRelation
 
+lessThanRelation :: Parser RBinOp
 lessThanRelation = do
   reservedOp "is"
   reservedOp "smaller"
   reservedOp "than"
   return Less
 
+greaterThanRelation :: Parser RBinOp
 greaterThanRelation = do
   reservedOp "is"
   reservedOp "bigger"
   reservedOp "than"
   return Greater
 
+equalRelation :: Parser RBinOp
 equalRelation = do
   reservedOp "equals"
   return Equal
