@@ -1,7 +1,8 @@
 module Main where
 
-import Stuttering.Parser
-import Stuttering.JavaOutput
-import Stuttering.Optimizer
+import Stuttering.Parser     (parseFile)
+import Stuttering.JavaOutput (output)
+import Stuttering.Optimizer  (optimize)
+import System.Environment    (getArgs)
 
-main = parseFile "example.stut" >>= putStrLn . output . optimize
+main = getArgs >>= mapM_ ((>>= putStrLn . output . optimize) . parseFile)
