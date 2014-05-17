@@ -1,21 +1,3 @@
-umm,
-this should print:
-Seq [
-    Assign "a" (IntConst 3),
-    Assign "b" (IntConst 4),
-    Assign "c" (ABinary Add (Var "a") (Var "b")),
-    If (RBinary Equal (Var "c") (IntConst 7))
-       (Seq [Print (IntConst 1)])
-       (Seq [Print (IntConst 0)]),
-    Assign "i" (IntConst 10),
-    While (RBinary Greater (Var "i") (IntConst 0))
-          (Seq [
-              Print (Var "i"),
-              Assign "i" (ABinary Subtract (Var "i") (IntConst 1))
-          ])
-]
-yeah...
-
 basically
     umm,
     this is a
