@@ -82,7 +82,11 @@ block parser = do
   return parsed
 
 stutteringParser :: Parser Stmt
-stutteringParser = whiteSpace >> statement
+stutteringParser = do
+  whiteSpace
+  stmt <- statement
+  eof
+  return stmt
 
 statement :: Parser Stmt
 statement = parens statement
