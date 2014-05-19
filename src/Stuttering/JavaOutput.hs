@@ -2,7 +2,7 @@ module Stuttering.JavaOutput
 ( output
 ) where
 
-import Stuttering.Parser
+import Stuttering.AST
 import Data.List
 
 singleIndent = "  "
@@ -12,78 +12,43 @@ output :: Stmt -> String
 output stmt =
   "public class Main {\n" ++
   indent 1 ++ "public static void main(String[] args) {\n" ++
-  outputStmt 2 stmt ++
+  showStmt 2 stmt ++
   indent 1 ++ "}\n" ++
   "}"
 
-outputStmt :: Int -> Stmt -> String
-outputStmt n (Seq stmts)       = outputStmts n stmts
-outputStmt n (Assign str expr) = outputAssign n str expr
-outputStmt n (Print expr)      = outputPrint n expr
-outputStmt n (If cond s1 s2)   = outputIf n cond s1 s2
-outputStmt n (While cond stmt) = outputWhile n cond stmt
+showStmt :: Int -> Stmt -> String
+showStmt n (Seq stmts)       = concatMap (showStmt n) stmts
+showStmt n (Assign str expr) = indent n ++ str ++ " = " ++ showExpr expr ++ ";\n"
+showStmt n (Print expr)      = indent n ++ "System.out.println(" ++ showExpr expr ++ ");\n"
+showStmt n (If cond s1 s2)   = indent n ++ "if(" ++ showExpr cond ++ ") {\n"
+                            ++ showStmt (n+1) s1
+                            ++ indent n ++ "} else {\n"
+                            ++ showStmt (n+1) s2
+                            ++ indent n ++ "}\n"
+showStmt n (While cond stmt) = indent n ++ "while(" ++ showExpr cond ++ ") {\n"
+                            ++ showStmt (n+1) stmt
+                            ++ indent n ++ "}\n"
 
-outputStmts :: Int -> [Stmt] -> String
-outputStmts n = concatMap (outputStmt n)
+showExpr :: Expr -> String
+showExpr (Var ident)         = ident
+showExpr (IntConst int)      = show int
+showExpr (BoolConst bool)    = if bool then "true" else "false"
+showExpr (UnaryOp op expr)   = showUnaryOp op ++ "(" ++ showExpr expr ++ ")"
+showExpr (BinaryOp op e1 e2) = "(" ++ showExpr e1 ++ ") " ++ showBinaryOp op ++ " (" ++ showExpr e2 ++ ")"
 
-outputAssign :: Int -> String -> AExpr -> String
-outputAssign n str expr =
-  indent n ++ str ++ " = " ++ outputAExpr expr ++ ";\n"
+showUnaryOp :: UnaryOp -> String
+showUnaryOp Negate = "-"
+showUnaryOp Not    = "!"
 
-outputPrint :: Int -> AExpr -> String
-outputPrint n expr =
-  indent n ++ "System.out.println(" ++ outputAExpr expr ++ ");\n"
-
-outputIf :: Int -> BExpr -> Stmt -> Stmt -> String
-outputIf n cond s1 s2 =
-  indent n ++ "if(" ++ outputBExpr cond ++ ") {\n" ++
-  outputStmt (n + 1) s1 ++
-  indent n ++ "} else {\n" ++
-  outputStmt (n + 1) s2 ++
-  indent n ++ "}\n"
-
-outputWhile :: Int -> BExpr -> Stmt -> String
-outputWhile n cond stmt =
-  indent n ++ "while(" ++ outputBExpr cond ++ ") {\n" ++
-  outputStmt (n + 1) stmt ++
-  indent n ++ "}\n"
-
-outputAExpr :: AExpr -> String
-outputAExpr (Var str)          = str
-outputAExpr (IntConst int)     = show int
-outputAExpr (Neg expr)         = '-' : outputAExpr expr
-outputAExpr (ABinary op e1 e2) = outputABinary op e1 e2
-
-outputABinary :: ABinOp -> AExpr -> AExpr -> String
-outputABinary op e1 e2 = unwords [outputAExpr e1, outputABinOp op, outputAExpr e2]
-
-outputABinOp :: ABinOp -> String
-outputABinOp Add      = "+"
-outputABinOp Subtract = "-"
-outputABinOp Multiply = "*"
-outputABinOp Divide   = "/"
-
-outputBExpr :: BExpr -> String
-outputBExpr (BoolConst bool)   = outputBool bool
-outputBExpr (Not expr)         = "!(" ++ outputBExpr expr ++ ")"
-outputBExpr (BBinary op e1 e2) = outputBBinary op e1 e2
-outputBExpr (RBinary op e1 e2) = outputRBinary op e1 e2
-
-outputBBinary :: BBinOp -> BExpr -> BExpr -> String
-outputBBinary op e1 e2 = unwords [outputBExpr e1, outputBBinOp op, outputBExpr e2]
-
-outputBBinOp :: BBinOp -> String
-outputBBinOp And = "&&"
-outputBBinOp Or  = "||"
-
-outputRBinary :: RBinOp -> AExpr -> AExpr -> String
-outputRBinary op e1 e2 = unwords [outputAExpr e1, outputRBinOp op, outputAExpr e2]
-
-outputRBinOp :: RBinOp -> String
-outputRBinOp Greater = ">"
-outputRBinOp Less    = "<"
-outputRBinOp Equal   = "=="
-
-outputBool :: Bool -> String
-outputBool True  = "true"
-outputBool False = "false"
+showBinaryOp :: BinaryOp -> String
+showBinaryOp Add            = "+"
+showBinaryOp Subtract       = "-"
+showBinaryOp Multiply       = "*"
+showBinaryOp Divide         = "/"
+showBinaryOp And            = "&&"
+showBinaryOp Or             = "||"
+showBinaryOp Greater        = ">"
+showBinaryOp Less           = "<"
+showBinaryOp Equal          = "=="
+showBinaryOp GreaterOrEqual = ">="
+showBinaryOp LessOrEqual    = "<="
