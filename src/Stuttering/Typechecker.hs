@@ -11,7 +11,7 @@ import qualified Data.Map as M
 type TypeMap = M.Map String Type
 
 getType :: TypeMap -> Expr -> Type
-getType t (Var i)                       = t ! str
+getType t (Var ident)                   = t ! ident
 getType _ (IntConst _)                  = Int
 getType _ (BoolConst _)                 = Bool
 getType _ (UnaryOp Negate _)            = Bool
