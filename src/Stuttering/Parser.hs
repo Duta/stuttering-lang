@@ -1,48 +1,14 @@
 module Stuttering.Parser
 ( parseString
 , parseFile
-, Expr(..)
-, UnaryOp(..)
-, BinaryOp(..)
-, Stmt(..)
 ) where
 
+import Stuttering.AST
 import Control.Monad
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Expr
 import Text.ParserCombinators.Parsec.Language
 import qualified Text.ParserCombinators.Parsec.Token as Token
-
-data Expr = Var String
-          | IntConst Integer
-          | BoolConst Bool
-          | UnaryOp UnaryOp Expr
-          | BinaryOp BinaryOp Expr Expr
-            deriving (Show, Eq)
-
-data UnaryOp = Negate
-             | Not
-               deriving (Show, Eq)
-
-data BinaryOp = Add
-              | Subtract
-              | Multiply
-              | Divide
-              | And
-              | Or
-              | Greater
-              | Less
-              | Equal
-              | GreaterOrEqual
-              | LessOrEqual
-                deriving (Show, Eq)
-
-data Stmt = Seq [Stmt]
-          | Assign String Expr
-          | Print Expr
-          | If Expr Stmt Stmt
-          | While Expr Stmt
-            deriving (Show, Eq)
 
 languageDef :: LanguageDef st
 languageDef = emptyDef
