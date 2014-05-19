@@ -52,25 +52,27 @@ lexer :: Token.TokenParser st
 lexer = Token.makeTokenParser languageDef
 
 -- Parses an identifier
-identifier   = Token.identifier lexer
+identifier = Token.identifier lexer
 -- Parses a reserved name
-reserved     = Token.reserved lexer
+reserved = Token.reserved lexer
 -- Parses an operator
-reservedOp   = Token.reservedOp lexer
--- reservedOps [] = return ()
+reservedOp = Token.reservedOp lexer
+-- Parses a multi-word operator
 reservedOps (x:[]) = reservedOp x
 reservedOps (h:t)  = reservedOp h >> reservedOps t
 -- Parses surrounding parentheses:
 --   parens p
 -- Takes care of the parentheses and
 -- uses p to parse what's inside them
-parens       = Token.parens lexer
+parens = Token.parens lexer
 -- Parses an integer
-integer      = Token.integer lexer
+integer = Token.integer lexer
+-- Parses a string literal
+stringLiteral = Token.stringLiteral lexer
 -- Parses a separator (a question mark)
-sep          = Token.symbol lexer "?"
+sep = Token.symbol lexer "?"
 -- Parses whitespace
-whiteSpace   = Token.whiteSpace lexer
+whiteSpace = Token.whiteSpace lexer
 -- Parses a scope block
 block parser = do
   reserved "basically"
@@ -150,9 +152,10 @@ operators =
 terminals :: Parser Expr
 terminals = parens expression
         <|> liftM Var identifier
-        <|> liftM IntConst integer
-        <|> (reserved "right" >> return (BoolConst True))
-        <|> (reserved "wrong" >> return (BoolConst False))
+        <|> liftM IntLit integer
+        <|> liftM StringLit stringLiteral
+        <|> (reserved "right" >> return (BoolLit True))
+        <|> (reserved "wrong" >> return (BoolLit False))
 
 parseString :: String -> Stmt
 parseString str =

@@ -31,8 +31,9 @@ showStmt n (While cond stmt) = indent n ++ "while(" ++ showExpr cond ++ ") {\n"
 
 showExpr :: Expr -> String
 showExpr (Var ident)         = ident
-showExpr (IntConst int)      = show int
-showExpr (BoolConst bool)    = if bool then "true" else "false"
+showExpr (IntLit int)        = show int
+showExpr (BoolLit bool)      = if bool then "true" else "false"
+showExpr (StringLit str)     = show str
 showExpr (UnaryOp op expr)   = showUnaryOp op ++ "(" ++ showExpr expr ++ ")"
 showExpr (BinaryOp op e1 e2) = "(" ++ showExpr e1 ++ ") " ++ showBinaryOp op ++ " (" ++ showExpr e2 ++ ")"
 

@@ -7,8 +7,9 @@ module Stuttering.AST
 ) where
 
 data Expr = Var String
-          | IntConst Integer
-          | BoolConst Bool
+          | IntLit Integer
+          | BoolLit Bool
+          | StringLit String
           | UnaryOp UnaryOp Expr
           | BinaryOp BinaryOp Expr Expr
             deriving (Show, Eq)
@@ -39,4 +40,5 @@ data Stmt = Seq [Stmt]
 
 data Type = Int
           | Bool
+          | String
             deriving (Show, Eq)
