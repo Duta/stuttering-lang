@@ -1,5 +1,6 @@
 module Stuttering.Typechecker
-( getType
+( TypeMap(..)
+, getType
 ) where
 
 import Stuttering.AST
