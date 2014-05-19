@@ -136,15 +136,15 @@ operators :: OperatorTable Char st Expr
 operators =
   [ [Prefix (reservedOp "negative" >> return (UnaryOp Negate))]
   , [Prefix (reservedOp "not"      >> return (UnaryOp Not))]
-  , [Infix (reservedOp "plus"   >> return (BinaryOp Add))      AssocLeft]
-  , [Infix (reservedOp "minus"  >> return (BinaryOp Subtract)) AssocLeft]
   , [Infix (reservedOp "times"  >> return (BinaryOp Multiply)) AssocLeft]
   , [Infix (reservedOp "over"   >> return (BinaryOp Divide))   AssocLeft]
-  , [Infix (reservedOp "and"    >> return (BinaryOp And))      AssocLeft]
-  , [Infix (reservedOp "or"     >> return (BinaryOp Or))       AssocLeft]
+  , [Infix (reservedOp "plus"   >> return (BinaryOp Add))      AssocLeft]
+  , [Infix (reservedOp "minus"  >> return (BinaryOp Subtract)) AssocLeft]
   , [Infix (reservedOp "equals" >> return (BinaryOp Equal))    AssocLeft]
   , [Infix (reservedOps ["is", "bigger",  "than"] >> return (BinaryOp Greater)) AssocLeft]
   , [Infix (reservedOps ["is", "smaller", "than"] >> return (BinaryOp Less))    AssocLeft]
+  , [Infix (reservedOp "and"    >> return (BinaryOp And))      AssocLeft]
+  , [Infix (reservedOp "or"     >> return (BinaryOp Or))       AssocLeft]
   ]
 
 terminals :: Parser Expr
