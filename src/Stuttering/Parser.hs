@@ -1,11 +1,9 @@
 module Stuttering.Parser
 ( parseString
 , parseFile
-, BExpr(..)
-, BBinOp(..)
-, RBinOp(..)
-, AExpr(..)
-, ABinOp(..)
+, Expr(..)
+, UnaryOp(..)
+, BinaryOp(..)
 , Stmt(..)
 ) where
 
@@ -15,40 +13,35 @@ import Text.ParserCombinators.Parsec.Expr
 import Text.ParserCombinators.Parsec.Language
 import qualified Text.ParserCombinators.Parsec.Token as Token
 
-data BExpr = BoolConst Bool
-           | Not BExpr
-           | BBinary BBinOp BExpr BExpr
-           | RBinary RBinOp AExpr AExpr
-             deriving (Show, Eq)
+data Expr = Var String
+          | IntConst Integer
+          | BoolConst Bool
+          | UnaryOp UnaryOp Expr
+          | BinaryOp BinaryOp Expr Expr
+            deriving (Show, Eq)
 
-data BBinOp = And
-            | Or
-              deriving (Show, Eq)
+data UnaryOp = Negate
+             | Not
+               deriving (Show, Eq)
 
-data RBinOp = Greater
-            | Less
-            | Equal
-            | GreaterOrEqual
-            | LessOrEqual
-              deriving (Show, Eq)
-
-data AExpr = Var String
-           | IntConst Integer
-           | Neg AExpr
-           | ABinary ABinOp AExpr AExpr
-             deriving (Show, Eq)
-
-data ABinOp = Add
-            | Subtract
-            | Multiply
-            | Divide
-              deriving (Show, Eq)
+data BinaryOp = Add
+              | Subtract
+              | Multiply
+              | Divide
+              | And
+              | Or
+              | Greater
+              | Less
+              | Equal
+              | GreaterOrEqual
+              | LessOrEqual
+                deriving (Show, Eq)
 
 data Stmt = Seq [Stmt]
-          | Assign String AExpr
-          | Print AExpr
-          | If BExpr Stmt Stmt
-          | While BExpr Stmt
+          | Assign String Expr
+          | Print Expr
+          | If Expr Stmt Stmt
+          | While Expr Stmt
             deriving (Show, Eq)
 
 languageDef :: LanguageDef st
@@ -98,6 +91,9 @@ identifier   = Token.identifier lexer
 reserved     = Token.reserved lexer
 -- Parses an operator
 reservedOp   = Token.reservedOp lexer
+-- reservedOps [] = return ()
+reservedOps (x:[]) = reservedOp x
+reservedOps (h:t)  = reservedOp h >> reservedOps t
 -- Parses surrounding parentheses:
 --   parens p
 -- Takes care of the parentheses and
@@ -139,7 +135,7 @@ statement' = ifStmt
 ifStmt :: Parser Stmt
 ifStmt = do
   reserved "if"
-  cond <- bExpression
+  cond <- expression
   reserved "then"
   stmt1 <- statement
   reserved "otherwise"
@@ -149,7 +145,7 @@ ifStmt = do
 whileStmt :: Parser Stmt
 whileStmt = do
   reserved "while"
-  cond <- bExpression
+  cond <- expression
   stmt <- statement
   return $ While cond stmt
 
@@ -158,78 +154,39 @@ assignStmt = do
   var <- identifier
   reservedOp "is"
   reservedOp "like"
-  expr <- aExpression
+  expr <- expression
   return $ Assign var expr
 
 printStmt :: Parser Stmt
 printStmt = do
   reserved "print"
-  expr <- aExpression
+  expr <- expression
   return $ Print expr
 
-aExpression :: Parser AExpr
-aExpression = buildExpressionParser aOperators aTerm
+expression :: Parser Expr
+expression = buildExpressionParser operators terminals
 
-bExpression :: Parser BExpr
-bExpression = buildExpressionParser bOperators bTerm
-
-aOperators :: OperatorTable Char st AExpr
-aOperators =
-  [ [Prefix (reservedOp "negative" >> return Neg)]
-  , [Infix  (reservedOp "times"    >> return (ABinary Multiply)) AssocLeft]
-  , [Infix  (reservedOp "over"     >> return (ABinary Divide)) AssocLeft]
-  , [Infix  (reservedOp "plus"     >> return (ABinary Add)) AssocLeft]
-  , [Infix  (reservedOp "minus"    >> return (ABinary Subtract)) AssocLeft]
+operators :: OperatorTable Char st Expr
+operators =
+  [ [Prefix (reservedOp "negative" >> return (UnaryOp Negate))]
+  , [Prefix (reservedOp "not"      >> return (UnaryOp Not))]
+  , [Infix (reservedOp "plus"   >> return (BinaryOp Add))      AssocLeft]
+  , [Infix (reservedOp "minus"  >> return (BinaryOp Subtract)) AssocLeft]
+  , [Infix (reservedOp "times"  >> return (BinaryOp Multiply)) AssocLeft]
+  , [Infix (reservedOp "over"   >> return (BinaryOp Divide))   AssocLeft]
+  , [Infix (reservedOp "and"    >> return (BinaryOp And))      AssocLeft]
+  , [Infix (reservedOp "or"     >> return (BinaryOp Or))       AssocLeft]
+  , [Infix (reservedOp "equals" >> return (BinaryOp Equal))    AssocLeft]
+  , [Infix (reservedOps ["is", "bigger",  "than"] >> return (BinaryOp Greater)) AssocLeft]
+  , [Infix (reservedOps ["is", "smaller", "than"] >> return (BinaryOp Less))    AssocLeft]
   ]
 
-bOperators :: OperatorTable Char st BExpr
-bOperators =
-  [ [Prefix (reservedOp "not" >> return Not)]
-  , [Infix  (reservedOp "and" >> return (BBinary And)) AssocLeft]
-  , [Infix  (reservedOp "or"  >> return (BBinary Or)) AssocLeft]
-  ]
-
-aTerm :: Parser AExpr
-aTerm = parens aExpression
-    <|> liftM Var identifier
-    <|> liftM IntConst integer
-
-bTerm :: Parser BExpr
-bTerm = parens bExpression
-    <|> (reserved "right" >> return (BoolConst True))
-    <|> (reserved "wrong" >> return (BoolConst False))
-    <|> rExpression
-
-rExpression :: Parser BExpr
-rExpression = do
-  a1 <- aExpression
-  op <- relation
-  a2 <- aExpression
-  return $ RBinary op a1 a2
-
-relation :: Parser RBinOp
-relation = greaterThanRelation
-       <|> lessThanRelation
-       <|> equalRelation
-
-lessThanRelation :: Parser RBinOp
-lessThanRelation = do
-  reservedOp "is"
-  reservedOp "smaller"
-  reservedOp "than"
-  return Less
-
-greaterThanRelation :: Parser RBinOp
-greaterThanRelation = do
-  reservedOp "is"
-  reservedOp "bigger"
-  reservedOp "than"
-  return Greater
-
-equalRelation :: Parser RBinOp
-equalRelation = do
-  reservedOp "equals"
-  return Equal
+terminals :: Parser Expr
+terminals = parens expression
+        <|> liftM Var identifier
+        <|> liftM IntConst integer
+        <|> (reserved "right" >> return (BoolConst True))
+        <|> (reserved "wrong" >> return (BoolConst False))
 
 parseString :: String -> Stmt
 parseString str =
