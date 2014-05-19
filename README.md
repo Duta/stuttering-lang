@@ -37,3 +37,8 @@ An example:
 
 Right now it only deals with numbers, since it was just a quick hack.
 I'll hopefully get round to adding in more stuff at some point.
+
+Also, it doesn't actually compile to Java yet, it's literally just a pretty-printer.
+I'd like to make the process more involved such that it actually compiles to Java.
+This will involve little annoyances like marking up the AST with information
+such as types and whether an assignment is the first to that variable.
