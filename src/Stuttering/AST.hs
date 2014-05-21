@@ -3,7 +3,6 @@ module Stuttering.AST
 , UnaryOp(..)
 , BinaryOp(..)
 , Stmt(..)
-, Type(..)
 , Value(..)
 ) where
 
