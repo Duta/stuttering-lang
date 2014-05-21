@@ -55,31 +55,42 @@ applyUnaryOp Not (BoolVal val)   = Right . BoolVal $ not val
 applyUnaryOp Not _               = Left "Non-boolean value in 'not'"
 
 applyBinaryOp :: BinaryOp -> Value -> Value -> Either String Value
-applyBinaryOp Add (IntVal int1) (IntVal int2)             = Right . IntVal $ int1 + int2
-applyBinaryOp Add (StringVal str1) (StringVal str2)       = Right . StringVal $ str1 ++ str2
-applyBinaryOp Add (StringVal str) (IntVal int)            = Right . StringVal $ str ++ show int
-applyBinaryOp Add (StringVal str) (BoolVal bool)          = Right . StringVal $ str ++ show bool
-applyBinaryOp Add (IntVal int) (StringVal str)            = Right . StringVal $ show int ++ str
-applyBinaryOp Add (BoolVal bool) (StringVal str)          = Right . StringVal $ show bool ++ str
-applyBinaryOp Subtract (IntVal int1) (IntVal int2)        = Right . IntVal $ int1 - int2
-applyBinaryOp Multiply (IntVal int1) (IntVal int2)        = Right . IntVal $ int1 * int2
-applyBinaryOp Divide (IntVal int1) (IntVal int2)          = Right . IntVal $ int1 `div` int2
-applyBinaryOp And v1 (BoolVal True)                       = Right v1
-applyBinaryOp And (BoolVal True) v2                       = Right v2
-applyBinaryOp And v1 (BoolVal False)                      = Right $ BoolVal False
-applyBinaryOp And (BoolVal False) v2                      = Right $ BoolVal False
-applyBinaryOp Or v1 (BoolVal True)                        = Right $ BoolVal True
-applyBinaryOp Or (BoolVal True) v2                        = Right $ BoolVal True
-applyBinaryOp Or v1 (BoolVal False)                       = Right v1
-applyBinaryOp Or (BoolVal False) v2                       = Right v2
-applyBinaryOp Greater (IntVal int1) (IntVal int2)         = Right . BoolVal $ int1 > int2
-applyBinaryOp Less (IntVal int1) (IntVal int2)            = Right . BoolVal $ int1 < int2
-applyBinaryOp GreaterOrEqual (IntVal int1) (IntVal int2)  = Right . BoolVal $ int1 >= int2
-applyBinaryOp LessOrEqual (IntVal int1) (IntVal int2)     = Right . BoolVal $ int1 <= int2
-applyBinaryOp Equal (IntVal int1) (IntVal int2)           = Right . BoolVal $ int1 == int2
-applyBinaryOp Equal (BoolVal bool1) (BoolVal bool2)       = Right . BoolVal $ bool1 == bool2
-applyBinaryOp _ v1 v2                                     = Left "Invalid operator/value pair"
--- TODO: Improve binary op type error handling
+applyBinaryOp Add (IntVal int1) (IntVal int2)            = Right . IntVal $ int1 + int2
+applyBinaryOp Add (StringVal str1) (StringVal str2)      = Right . StringVal $ str1 ++ str2
+applyBinaryOp Add (StringVal str) (IntVal int)           = Right . StringVal $ str ++ show int
+applyBinaryOp Add (StringVal str) (BoolVal bool)         = Right . StringVal $ str ++ show bool
+applyBinaryOp Add (IntVal int) (StringVal str)           = Right . StringVal $ show int ++ str
+applyBinaryOp Add (BoolVal bool) (StringVal str)         = Right . StringVal $ show bool ++ str
+applyBinaryOp Add (StringVal _) _                        = Left "Non-stringifiable value in concatenation"
+applyBinaryOp Add _ (StringVal _)                        = Left "Non-stringifiable value in concatenation"
+applyBinaryOp Add _ _                                    = Left "Non-int value(s) in addition"
+applyBinaryOp Subtract (IntVal int1) (IntVal int2)       = Right . IntVal $ int1 - int2
+applyBinaryOp Subtract _ _                               = Left "Non-int value(s) in subtraction"
+applyBinaryOp Multiply (IntVal int1) (IntVal int2)       = Right . IntVal $ int1 * int2
+applyBinaryOp Multiply _ _                               = Left "Non-int value(s) in multiplication"
+applyBinaryOp Divide (IntVal int1) (IntVal int2)         = Right . IntVal $ int1 `div` int2
+applyBinaryOp Divide _ _                                 = Left "Non-int value(s) in division"
+applyBinaryOp And v1 (BoolVal True)                      = Right v1
+applyBinaryOp And (BoolVal True) v2                      = Right v2
+applyBinaryOp And _ (BoolVal False)                      = Right $ BoolVal False
+applyBinaryOp And (BoolVal False) _                      = Right $ BoolVal False
+applyBinaryOp And _ _                                    = Left "Non-boolean value(s) in 'and'"
+applyBinaryOp Or _ (BoolVal True)                        = Right $ BoolVal True
+applyBinaryOp Or (BoolVal True) _                        = Right $ BoolVal True
+applyBinaryOp Or v1 (BoolVal False)                      = Right v1
+applyBinaryOp Or (BoolVal False) v2                      = Right v2
+applyBinaryOp Or _ _                                     = Left "Non-boolean value(s) in 'or'"
+applyBinaryOp Greater (IntVal int1) (IntVal int2)        = Right . BoolVal $ int1 > int2
+applyBinaryOp Greater _ _                                = Left "Non-int value(s) in greater-than comparison"
+applyBinaryOp Less (IntVal int1) (IntVal int2)           = Right . BoolVal $ int1 < int2
+applyBinaryOp Less _ _                                   = Left "Non-int value(s) in less-than comparison"
+applyBinaryOp GreaterOrEqual (IntVal int1) (IntVal int2) = Right . BoolVal $ int1 >= int2
+applyBinaryOp GreaterOrEqual _ _                         = Left "Non-int value(s) in greater-than-or-equal comparison"
+applyBinaryOp LessOrEqual (IntVal int1) (IntVal int2)    = Right . BoolVal $ int1 <= int2
+applyBinaryOp LessOrEqual _ _                            = Left "Non-int value(s) in less-than-or-equal comparison"
+applyBinaryOp Equal (IntVal int1) (IntVal int2)          = Right . BoolVal $ int1 == int2
+applyBinaryOp Equal (BoolVal bool1) (BoolVal bool2)      = Right . BoolVal $ bool1 == bool2
+applyBinaryOp Equal _ _                                  = Left "Incomparable values in equality comparison"
 
 repr :: Value -> String
 repr (IntVal int)    = show int
