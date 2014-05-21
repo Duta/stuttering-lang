@@ -17,21 +17,21 @@ runtimeError = error . ("Runtime error: "++)
 interpretStmt :: ValueMap -> Stmt -> IO ValueMap
 interpretStmt m (Seq stmts)         = foldM interpretStmt m stmts
 interpretStmt m (Assign ident expr) = case evalExpr m expr of
-  Right val -> return $ M.insert ident val m
-  Left errMsg -> runtimeError errMsg
+  Right val            -> return $ M.insert ident val m
+  Left errMsg          -> runtimeError errMsg
 interpretStmt m (Print expr)        = case evalExpr m expr of
-  (Right val) -> putStrLn (repr val) >> return m
-  (Left errMsg) -> runtimeError errMsg
+  Right val            -> putStrLn (repr val) >> return m
+  Left errMsg          -> runtimeError errMsg
 interpretStmt m (If cond s1 s2)     = case evalExpr m cond of
-  (Right (BoolVal bool)) -> interpretStmt m $ if bool then s1 else s2
-  (Right _)              -> runtimeError "Non-boolean value in if condition"
-  (Left errMsg)          -> runtimeError errMsg
+  Right (BoolVal bool) -> interpretStmt m $ if bool then s1 else s2
+  Right _              -> runtimeError "Non-boolean value in if condition"
+  Left errMsg          -> runtimeError errMsg
 interpretStmt m (While cond stmt)   = case evalExpr m cond of
-  (Right (BoolVal bool)) -> if bool
+  Right (BoolVal bool) -> if bool
     then interpretStmt m stmt >>= flip interpretStmt (While cond stmt)
     else return m
-  (Right _)              -> runtimeError "Non-boolean value in while condition"
-  (Left errMsg)          -> runtimeError errMsg
+  Right _              -> runtimeError "Non-boolean value in while condition"
+  Left errMsg          -> runtimeError errMsg
 
 evalExpr :: ValueMap -> Expr -> Either String Value
 evalExpr m (Var ident)         = if M.member ident m
@@ -41,8 +41,8 @@ evalExpr m (IntLit int)        = Right $ IntVal int
 evalExpr m (BoolLit bool)      = Right $ BoolVal bool
 evalExpr m (StringLit str)     = Right $ StringVal str
 evalExpr m (UnaryOp op expr)   = case evalExpr m expr of
-  (Right val) -> applyUnaryOp op val
-  (Left errMsg) -> Left errMsg
+  Right val            -> applyUnaryOp op val
+  Left errMsg          -> Left errMsg
 evalExpr m (BinaryOp op e1 e2) = case (evalExpr m e1, evalExpr m e2) of
   (Right v1, Right v2) -> applyBinaryOp op v1 v2
   (Left errMsg, _)     -> Left errMsg
