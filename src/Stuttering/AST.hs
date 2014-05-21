@@ -39,11 +39,6 @@ data Stmt = Seq [Stmt]
           | While Expr Stmt
             deriving (Show, Eq)
 
-data Type = Int
-          | Bool
-          | String
-            deriving (Show, Eq)
-
 data Value = IntVal Integer
            | BoolVal Bool
            | StringVal String
