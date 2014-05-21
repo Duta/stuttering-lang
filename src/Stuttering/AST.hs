@@ -4,6 +4,7 @@ module Stuttering.AST
 , BinaryOp(..)
 , Stmt(..)
 , Type(..)
+, Value(..)
 ) where
 
 data Expr = Var String
@@ -42,3 +43,7 @@ data Type = Int
           | Bool
           | String
             deriving (Show, Eq)
+
+data Value = IntVal Integer
+           | BoolVal Bool
+           | StringVal String
