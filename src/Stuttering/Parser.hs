@@ -15,8 +15,8 @@ languageDef = emptyDef
   { Token.commentStart    = "umm,"
   , Token.commentEnd      = "yeah..."
   , Token.commentLine     = "um,"
-  , Token.identStart      = letter
-  , Token.identLetter     = alphaNum
+  , Token.identStart      = letter <|> char '_'
+  , Token.identLetter     = alphaNum <|> char '_'
   , Token.reservedNames   =
     [ "basically"
     , "is"
