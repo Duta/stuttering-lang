@@ -36,6 +36,7 @@ cfExpr (BinaryOp op e1 e2) = case (op, cfExpr e1, cfExpr e2) of
   (Subtract, IntLit int1, IntLit int2)       -> IntLit $ int1 - int2
   (Multiply, IntLit int1, IntLit int2)       -> IntLit $ int1 * int2
   (Divide, IntLit int1, IntLit int2)         -> IntLit $ int1 `div` int2
+  (Mod, IntLit int1, IntLit int2)            -> IntLit $ int1 `mod` int2
   (And, optE1, BoolLit True)                 -> optE1
   (And, BoolLit True, optE2)                 -> optE2
   (And, optE1, BoolLit False)                -> BoolLit False

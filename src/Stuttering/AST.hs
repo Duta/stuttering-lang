@@ -22,6 +22,7 @@ data BinaryOp = Add
               | Subtract
               | Multiply
               | Divide
+              | Mod
               | And
               | Or
               | Greater

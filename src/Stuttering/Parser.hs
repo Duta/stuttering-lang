@@ -35,6 +35,7 @@ languageDef = emptyDef
     , "minus"
     , "times"
     , "over"
+    , "mod"
     , "is"
     , "like"
     , "negative"
@@ -144,6 +145,7 @@ operators =
   , [Prefix (reservedOp "not"      >> return (UnaryOp Not))]
   , [Infix (reservedOp "times"  >> return (BinaryOp Multiply)) AssocLeft]
   , [Infix (reservedOp "over"   >> return (BinaryOp Divide))   AssocLeft]
+  , [Infix (reservedOp "mod"    >> return (BinaryOp Mod))      AssocLeft]
   , [Infix (reservedOp "plus"   >> return (BinaryOp Add))      AssocLeft]
   , [Infix (reservedOp "minus"  >> return (BinaryOp Subtract)) AssocLeft]
   , [Infix (reservedOp "equals" >> return (BinaryOp Equal))    AssocLeft]
