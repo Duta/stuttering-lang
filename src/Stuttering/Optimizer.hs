@@ -22,6 +22,7 @@ cfExpr (Var ident)         = Var ident
 cfExpr (IntLit int)        = IntLit int
 cfExpr (BoolLit bool)      = BoolLit bool
 cfExpr (StringLit str)     = StringLit str
+cfExpr StructLit           = StructLit
 cfExpr (UnaryOp op expr)   = case (op, cfExpr expr) of
   (Negate, IntLit int) -> IntLit $ -int
   (Not, BoolLit bool)  -> BoolLit $ not bool

@@ -3,13 +3,18 @@ module Stuttering.AST
 , UnaryOp(..)
 , BinaryOp(..)
 , Stmt(..)
-, Value(..)
+, RValue(..)
+, LValue(..)
+, ValueMap
 ) where
+
+import qualified Data.Map as M
 
 data Expr = Var String
           | IntLit Integer
           | BoolLit Bool
           | StringLit String
+          | StructLit
           | UnaryOp UnaryOp Expr
           | BinaryOp BinaryOp Expr Expr
             deriving (Show, Eq)
@@ -30,15 +35,24 @@ data BinaryOp = Add
               | Equal
               | GreaterOrEqual
               | LessOrEqual
+              | Field
                 deriving (Show, Eq)
 
 data Stmt = Seq [Stmt]
-          | Assign String Expr
+          | Assign Expr Expr
           | Print Expr
           | If Expr Stmt Stmt
           | While Expr Stmt
             deriving (Show, Eq)
 
-data Value = IntVal Integer
-           | BoolVal Bool
-           | StringVal String
+data RValue = VarAccess String
+            | StructAccess RValue String
+              deriving (Show, Eq)
+
+data LValue = Int Integer
+            | Bool Bool
+            | String String
+            | Struct ValueMap
+              deriving (Show, Eq)
+
+type ValueMap = M.Map String LValue

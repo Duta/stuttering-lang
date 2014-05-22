@@ -29,6 +29,8 @@ languageDef = emptyDef
     , "if"
     , "then"
     , "otherwise"
+    , "a"
+    , "struct"
     ]
   , Token.reservedOpNames =
     [ "plus"
@@ -46,6 +48,7 @@ languageDef = emptyDef
     , "bigger"
     , "than"
     , "equals"
+    , "'s"
     ]
   }
 
@@ -124,7 +127,7 @@ whileStmt = do
 
 assignStmt :: Parser Stmt
 assignStmt = do
-  var <- identifier
+  var <- expression
   reservedOp "is"
   reservedOp "like"
   expr <- expression
@@ -141,7 +144,8 @@ expression = buildExpressionParser operators terminals
 
 operators :: OperatorTable Char st Expr
 operators =
-  [ [Prefix (reservedOp "negative" >> return (UnaryOp Negate))]
+  [ [Infix (reservedOp "'s"     >> return (BinaryOp Field)) AssocLeft]
+  , [Prefix (reservedOp "negative" >> return (UnaryOp Negate))]
   , [Prefix (reservedOp "not"      >> return (UnaryOp Not))]
   , [Infix (reservedOp "times"  >> return (BinaryOp Multiply)) AssocLeft]
   , [Infix (reservedOp "over"   >> return (BinaryOp Divide))   AssocLeft]
@@ -149,8 +153,8 @@ operators =
   , [Infix (reservedOp "plus"   >> return (BinaryOp Add))      AssocLeft]
   , [Infix (reservedOp "minus"  >> return (BinaryOp Subtract)) AssocLeft]
   , [Infix (reservedOp "equals" >> return (BinaryOp Equal))    AssocLeft]
-  , [Infix (reservedOps ["is", "bigger",  "than"] >> return (BinaryOp Greater)) AssocLeft]
-  , [Infix (reservedOps ["is", "smaller", "than"] >> return (BinaryOp Less))    AssocLeft]
+  , [Infix (try (reservedOps ["is", "bigger",  "than"]) >> return (BinaryOp Greater)) AssocLeft]
+  , [Infix (try (reservedOps ["is", "smaller", "than"]) >> return (BinaryOp Less))    AssocLeft]
   , [Infix (reservedOp "and"    >> return (BinaryOp And))      AssocLeft]
   , [Infix (reservedOp "or"     >> return (BinaryOp Or))       AssocLeft]
   ]
@@ -162,6 +166,7 @@ terminals = parens expression
         <|> liftM StringLit stringLiteral
         <|> (reserved "right" >> return (BoolLit True))
         <|> (reserved "wrong" >> return (BoolLit False))
+        <|> (reserved "a" >> reserved "struct" >> return StructLit)
 
 parseString :: String -> Stmt
 parseString str =
