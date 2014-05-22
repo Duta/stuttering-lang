@@ -64,3 +64,13 @@ Calculating the meaning of it all:
         theAnswer is like 10 plus 100 over 3 minus 1?
         print theAnswer
     so yeah
+
+Making sure I don't forget my details:
+
+    basically
+        nineteen is like 19?
+        bertie is like a struct?
+        bertie's name is like "Bertie Wheen"?
+        bertie's age is like nineteen?
+        print bertie's name plus ": " plus bertie's age
+    so yeah
