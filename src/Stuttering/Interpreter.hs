@@ -4,6 +4,7 @@ module Stuttering.Interpreter
 
 import Stuttering.AST
 import Control.Monad
+import Data.List
 import qualified Data.Map as M
 
 interpret :: Stmt -> IO ()
@@ -91,7 +92,7 @@ repr :: LValue -> String
 repr (Int int)     = show int
 repr (Bool bool)   = if bool then "right" else "wrong"
 repr (String str)  = str
-repr (Struct vals) = show vals -- TODO: Improve
+repr (Struct vals) = intercalate ", " . fmap (\(k,v) -> k ++ ": " ++ repr v) $ M.assocs vals
 
 applyUnaryOp :: UnaryOp -> LValue -> Either String LValue
 applyUnaryOp Negate (Int val) = Right . Int $ negate val
