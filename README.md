@@ -3,37 +3,49 @@ stuttering
 
 Stuttering is a simple language which attempts to parse how I (fail to) express ideas.
 
-An example:
+An example, generating the first 100 primes:
 
-    basically
-        umm,
-        this is a
-        multiline comment.
-        yeah...
+    basically umm,
+    this program generates and
+    prints the first 100 primes
+    yeah...
+        totalPrimes is like 100? um, this is the total number of primes to generate
+        numPrimes is like 0?     um, this is the current number of primes generated
+        currentNum is like 2?    um, this is the current number being checked for primality
 
-        a is like 3 plus 17 over 2?
-        b is like negative 4 times 5?
-        c is like a plus b?
-        if 5 minus 1 equals 4
-        or c equals 21 over 3
-        and 12 is bigger than 2 then basically
-            print 1
-        so yeah otherwise basically
-            print negative 0
-        so yeah?
+        while numPrimes is smaller than totalPrimes
+        basically um, determine if the current number is prime
+            um, assume it is prime
+            isPrime is like true?
 
-        i is like 10?
-        while i is bigger than 0 basically
-            print i?
-            i is like i minus 1
+            um, check if it has any divisors
+            currentDivisor is like 2?
+            while currentDivisor is smaller than currentNum over 2 basically
+                if currentNum mod currentDivisor equals 0 then
+                    isPrime is like false
+                otherwise basically
+                    um, do nothing
+                so yeah?
+
+                currentDivisor is like currentDivisor plus 1
+            so yeah?
+
+            um, if it's prime, print it
+            if isPrime then basically
+                numPrimes is like numPrimes plus 1?
+                print currentNum
+            so yeah otherwise basically
+                um, do nothing
+            so yeah?
+
+            um, increment the current number
+            currentNum is like currentNum plus 1
         so yeah
-
-        um, this is a single line comment.
     so yeah
 
 [Stream of consciousness](http://en.wikipedia.org/wiki/Stream_of_consciousness_(narrative_mode)) style:
 
-    basically a is like 3 plus 17 over 2? b is like negative 4 times 5? c is like a plus b? if 5 minus 1 equals 4 or c equals 21 over 3 and 12 is bigger than 2 then basically print 1 so yeah otherwise basically print negative 0 so yeah? i is like 10? while i is bigger than 0 basically print i? i is like i minus 1 so yeah so yeah
+    basically totalPrimes is like 100? numPrimes is like 0? currentNum is like 2? while numPrimes is smaller than totalPrimes basically isPrime is like true? currentDivisor is like 2? while currentDivisor is smaller than currentNum over 2 basically if currentNum mod currentDivisor equals 0 then isPrime is like false otherwise basically so yeah? currentDivisor is like currentDivisor plus 1 so yeah? if isPrime then basically numPrimes is like numPrimes plus 1? print currentNum so yeah otherwise basically so yeah? currentNum is like currentNum plus 1 so yeah so yeah
 
 * * *
 

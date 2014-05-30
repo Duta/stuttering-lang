@@ -1,0 +1,41 @@
+basically umm,
+this program generates and
+prints the first 100 primes
+yeah...
+
+    totalPrimes is like 100? um, this is the total number of primes to generate
+    numPrimes is like 0?     um, this is the current number of primes generated
+    currentNum is like 2?    um, this is the current number being checked for primality
+
+    while numPrimes is smaller than totalPrimes
+    basically um, determine if the current number is prime
+
+        um, assume it is prime
+        isPrime is like true?
+
+        um, check if it has any divisors
+        currentDivisor is like 2?
+        while currentDivisor is smaller than currentNum over 2 basically
+            if currentNum mod currentDivisor equals 0 then
+                isPrime is like false
+            otherwise basically
+                um, do nothing
+            so yeah?
+
+            currentDivisor is like currentDivisor plus 1
+        so yeah?
+
+        um, if it's prime, print it
+        if isPrime then basically
+            numPrimes is like numPrimes plus 1?
+            print currentNum
+        so yeah otherwise basically
+            um, do nothing
+        so yeah?
+
+        um, increment the current number
+        currentNum is like currentNum plus 1
+
+    so yeah
+
+so yeah
