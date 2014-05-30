@@ -23,8 +23,8 @@ languageDef = emptyDef
     , "like"
     , "so"
     , "yeah"
-    , "right"
-    , "wrong"
+    , "true"
+    , "false"
     , "print"
     , "if"
     , "then"
@@ -164,8 +164,8 @@ terminals = parens expression
         <|> liftM Var identifier
         <|> liftM IntLit integer
         <|> liftM StringLit stringLiteral
-        <|> (reserved "right" >> return (BoolLit True))
-        <|> (reserved "wrong" >> return (BoolLit False))
+        <|> (reserved "true"  >> return (BoolLit True))
+        <|> (reserved "false" >> return (BoolLit False))
         <|> (reserved "a" >> reserved "struct" >> return StructLit)
 
 parseString :: String -> Stmt

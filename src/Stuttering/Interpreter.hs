@@ -90,7 +90,7 @@ evalLExpr m (BinaryOp op e1 e2) = case (evalLExpr m e1, evalLExpr m e2) of
 
 repr :: LValue -> String
 repr (Int int)     = show int
-repr (Bool bool)   = if bool then "right" else "wrong"
+repr (Bool bool)   = if bool then "true" else "false"
 repr (String str)  = str
 repr (Struct vals) = ("("++) . (++")")
                    . intercalate ", "
