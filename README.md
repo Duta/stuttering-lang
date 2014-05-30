@@ -20,7 +20,7 @@ An example, generating the first 100 primes:
 
             um, check if it has any divisors
             currentDivisor is like 2?
-            while currentDivisor is smaller than currentNum over 2 basically
+            while currentDivisor is smaller than currentNum over 2 and isPrime basically
                 if currentNum mod currentDivisor equals 0 then
                     isPrime is like false
                 otherwise basically
@@ -45,7 +45,7 @@ An example, generating the first 100 primes:
 
 [Stream of consciousness](http://en.wikipedia.org/wiki/Stream_of_consciousness_(narrative_mode)) style:
 
-    basically totalPrimes is like 100? numPrimes is like 0? currentNum is like 2? while numPrimes is smaller than totalPrimes basically isPrime is like true? currentDivisor is like 2? while currentDivisor is smaller than currentNum over 2 basically if currentNum mod currentDivisor equals 0 then isPrime is like false otherwise basically so yeah? currentDivisor is like currentDivisor plus 1 so yeah? if isPrime then basically numPrimes is like numPrimes plus 1? print currentNum so yeah otherwise basically so yeah? currentNum is like currentNum plus 1 so yeah so yeah
+    basically totalPrimes is like 100? numPrimes is like 0? currentNum is like 2? while numPrimes is smaller than totalPrimes basically isPrime is like true? currentDivisor is like 2? while currentDivisor is smaller than currentNum over 2 and isPrime basically if currentNum mod currentDivisor equals 0 then isPrime is like false otherwise basically so yeah? currentDivisor is like currentDivisor plus 1 so yeah? if isPrime then basically numPrimes is like numPrimes plus 1? print currentNum so yeah otherwise basically so yeah? currentNum is like currentNum plus 1 so yeah so yeah
 
 * * *
 

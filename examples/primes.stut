@@ -15,7 +15,7 @@ yeah...
 
         um, check if it has any divisors
         currentDivisor is like 2?
-        while currentDivisor is smaller than currentNum over 2 basically
+        while currentDivisor is smaller than currentNum over 2 and isPrime basically
             if currentNum mod currentDivisor equals 0 then
                 isPrime is like false
             otherwise basically
