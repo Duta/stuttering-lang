@@ -62,8 +62,7 @@ reserved = Token.reserved lexer
 -- Parses an operator
 reservedOp = Token.reservedOp lexer
 -- Parses a multi-word operator
-reservedOps (x:[]) = reservedOp x
-reservedOps (h:t)  = reservedOp h >> reservedOps t
+reservedOps = mapM reservedOp
 -- Parses surrounding parentheses:
 --   parens p
 -- Takes care of the parentheses and
@@ -99,7 +98,7 @@ statement = parens statement
 
 sequenceOfStmt :: Parser Stmt
 sequenceOfStmt = do
-  list <- block $ sepBy1 statement' sep
+  list <- block $ sepBy statement' sep
   return $ Seq list
 
 statement' :: Parser Stmt
