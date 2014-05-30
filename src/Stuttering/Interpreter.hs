@@ -15,40 +15,40 @@ runtimeError = error . ("Runtime error: "++)
 
 interpretStmt :: ValueMap -> Stmt -> IO ValueMap
 interpretStmt m (Seq stmts)         = foldM interpretStmt m stmts
-interpretStmt m (Assign ident expr) = case (evalRExpr ident, evalLExpr m expr) of
-  (Right rval, Right val)              -> case getAssignedVal m rval val of
-    Right val'  -> return $ M.insert (getRValIdent rval) val' m
+interpretStmt m (Assign ident expr) = case (evalLExpr ident, evalRExpr m expr) of
+  (Right lval, Right val)              -> case getAssignedVal m lval val of
+    Right val'  -> return $ M.insert (getLValIdent lval) val' m
     Left errMsg -> runtimeError errMsg
   (Left errMsg, _)                     -> runtimeError errMsg
   (_, Left errMsg)                     -> runtimeError errMsg
-interpretStmt m (Print expr)        = case evalLExpr m expr of
+interpretStmt m (Print expr)        = case evalRExpr m expr of
   Right val   -> putStrLn (repr val) >> return m
   Left errMsg -> runtimeError errMsg
-interpretStmt m (If cond s1 s2)     = case evalLExpr m cond of
+interpretStmt m (If cond s1 s2)     = case evalRExpr m cond of
   Right (Bool bool) -> interpretStmt m $ if bool then s1 else s2
   Right _           -> runtimeError "Non-boolean value in if condition"
   Left errMsg       -> runtimeError errMsg
-interpretStmt m (While cond stmt)   = case evalLExpr m cond of
+interpretStmt m (While cond stmt)   = case evalRExpr m cond of
   Right (Bool bool) -> if bool
     then interpretStmt m stmt >>= flip interpretStmt (While cond stmt)
     else return m
   Right _           -> runtimeError "Non-boolean value in while condition"
   Left errMsg       -> runtimeError errMsg
 
-getAssignedVal :: ValueMap -> RValue -> LValue -> Either String LValue
+getAssignedVal :: ValueMap -> LValue -> RValue -> Either String RValue
 getAssignedVal _ (VarAccess _) val               = return val
-getAssignedVal m rval@(StructAccess _ field) val = liftM (Struct . M.insert field val) $ getRValMap m rval
+getAssignedVal m lval@(StructAccess _ field) val = liftM (Struct . M.insert field val) $ getLValMap m lval
 
-getRValIdent :: RValue -> String
-getRValIdent (VarAccess ident)     = ident
-getRValIdent (StructAccess rval _) = getRValIdent rval
+getLValIdent :: LValue -> String
+getLValIdent (VarAccess ident)     = ident
+getLValIdent (StructAccess lval _) = getLValIdent lval
 
-getRValMap :: ValueMap -> RValue -> Either String ValueMap
-getRValMap m (VarAccess _)             = Right m
-getRValMap m (StructAccess rval field) = case rval of
+getLValMap :: ValueMap -> LValue -> Either String ValueMap
+getLValMap m (VarAccess _)             = Right m
+getLValMap m (StructAccess lval field) = case lval of
   VarAccess ident      -> lookupStruct m ident field
   StructAccess _ ident -> do
-    m' <- getRValMap m rval
+    m' <- getLValMap m lval
     lookupStruct m' ident field
   where
     lookupStruct m ident field = if M.member ident m
@@ -57,38 +57,38 @@ getRValMap m (StructAccess rval field) = case rval of
             _         -> Left $ ident ++ " is not a struct"
       else Left $ "Attempted to use undefined struct " ++ ident
 
-evalRExpr :: Expr -> Either String RValue
-evalRExpr (Var ident)            = Right $ VarAccess ident
-evalRExpr (BinaryOp Field e1 e2) = case (evalRExpr e1, evalRExpr e2) of
-  (Right rval, Right (VarAccess ident)) -> Right $ StructAccess rval ident
-  _                                     -> Left "Attempted to use lvalue in struct access"
-evalRExpr _                      = Left "Attempted to use lvalue in rvalue context"
+evalLExpr :: Expr -> Either String LValue
+evalLExpr (Var ident)            = Right $ VarAccess ident
+evalLExpr (BinaryOp Field e1 e2) = case (evalLExpr e1, evalLExpr e2) of
+  (Right lval, Right (VarAccess ident)) -> Right $ StructAccess lval ident
+  _                                     -> Left "Attempted to use rvalue in struct access"
+evalLExpr _                      = Left "Attempted to use rvalue in lvalue context"
 
-evalLExpr :: ValueMap -> Expr -> Either String LValue
-evalLExpr m (Var ident)         = if M.member ident m
+evalRExpr :: ValueMap -> Expr -> Either String RValue
+evalRExpr m (Var ident)         = if M.member ident m
   then Right $ m M.! ident
   else Left $ "Attempted to access undefined variable " ++ ident
-evalLExpr m (IntLit int)        = Right $ Int int
-evalLExpr m (BoolLit bool)      = Right $ Bool bool
-evalLExpr m (StringLit str)     = Right $ String str
-evalLExpr m StructLit           = Right $ Struct M.empty
-evalLExpr m (UnaryOp op expr)   = case evalLExpr m expr of
+evalRExpr m (IntLit int)        = Right $ Int int
+evalRExpr m (BoolLit bool)      = Right $ Bool bool
+evalRExpr m (StringLit str)     = Right $ String str
+evalRExpr m StructLit           = Right $ Struct M.empty
+evalRExpr m (UnaryOp op expr)   = case evalRExpr m expr of
   Right val            -> applyUnaryOp op val
   Left errMsg          -> Left errMsg
-evalLExpr m (BinaryOp Field expr (Var field)) = do
-  rval <- evalRExpr expr
-  m' <- getRValMap m rval
-  let ident = getRValIdent rval
-  struct <- evalLExpr m' (Var ident)
+evalRExpr m (BinaryOp Field expr (Var field)) = do
+  lval <- evalLExpr expr
+  m' <- getLValMap m lval
+  let ident = getLValIdent lval
+  struct <- evalRExpr m' (Var ident)
   case struct of
-    Struct vals -> evalLExpr vals (Var field)
+    Struct vals -> evalRExpr vals (Var field)
     _           -> fail $ ident ++ " is not a struct"
-evalLExpr m (BinaryOp op e1 e2) = case (evalLExpr m e1, evalLExpr m e2) of
+evalRExpr m (BinaryOp op e1 e2) = case (evalRExpr m e1, evalRExpr m e2) of
   (Right v1, Right v2) -> applyBinaryOp op v1 v2
   (Left errMsg, _)     -> Left errMsg
   (_, Left errMsg)     -> Left errMsg
 
-repr :: LValue -> String
+repr :: RValue -> String
 repr (Int int)     = show int
 repr (Bool bool)   = if bool then "true" else "false"
 repr (String str)  = str
@@ -97,14 +97,14 @@ repr (Struct vals) = ("("++) . (++")")
                    . fmap (\(k,v) -> k ++ ": " ++ repr v)
                    $ M.assocs vals
 
-applyUnaryOp :: UnaryOp -> LValue -> Either String LValue
+applyUnaryOp :: UnaryOp -> RValue -> Either String RValue
 applyUnaryOp Negate (Int val) = Right . Int $ negate val
 applyUnaryOp Negate _            = Left "Non-int value in negation"
 
 applyUnaryOp Not (Bool val)   = Right . Bool $ not val
 applyUnaryOp Not _               = Left "Non-boolean value in 'not'"
 
-applyBinaryOp :: BinaryOp -> LValue -> LValue -> Either String LValue
+applyBinaryOp :: BinaryOp -> RValue -> RValue -> Either String RValue
 applyBinaryOp Add (Int int1) (Int int2)            = Right . Int $ int1 + int2
 applyBinaryOp Add (String str1) (String str2)      = Right . String $ str1 ++ str2
 applyBinaryOp Add (String str) (Int int)           = Right . String $ str ++ show int

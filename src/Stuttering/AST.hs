@@ -3,8 +3,8 @@ module Stuttering.AST
 , UnaryOp(..)
 , BinaryOp(..)
 , Stmt(..)
-, RValue(..)
 , LValue(..)
+, RValue(..)
 , ValueMap
 ) where
 
@@ -45,14 +45,14 @@ data Stmt = Seq [Stmt]
           | While Expr Stmt
             deriving (Show, Eq)
 
-data RValue = VarAccess String
-            | StructAccess RValue String
+data LValue = VarAccess String
+            | StructAccess LValue String
               deriving (Show, Eq)
 
-data LValue = Int Integer
+data RValue = Int Integer
             | Bool Bool
             | String String
             | Struct ValueMap
               deriving (Show, Eq)
 
-type ValueMap = M.Map String LValue
+type ValueMap = M.Map String RValue
